@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import contrato from '../contracts/produtos.contract'
+import contrato from '../contracts/usuarios.contracts'
 
 describe('Testes da Funcionalidade Usuários', () => {
 
@@ -20,11 +20,11 @@ describe('Testes da Funcionalidade Usuários', () => {
   });
 
   it('Deve cadastrar um usuário com sucesso', () => {
-    let email = 'emailEBAC@' + Math.floor(Math.random() * 10000000000)
+    let email = 'emailEBACeditado' + Math.floor(Math.random() * 10000000000) + '@ebac.com'
     cy.cadastrarUsuario("louco", email, "teste", "true")
     .should(response => {
-      expect(response.body).to.have.property('usuarios')
-    });
+    expect(response.status).equal(201)
+    })
   })
 
   it('Deve validar um usuário com email inválido', () => {
@@ -35,7 +35,7 @@ describe('Testes da Funcionalidade Usuários', () => {
   });
 
   it('Deve editar um usuário previamente cadastrado', () => {
-    let email = 'email EBAC editado' + Math.floor(Math.random() * 10000000000)
+    let email = 'emailEBACeditado' + Math.floor(Math.random() * 10000000000) + '@ebac.com'
     cy.cadastrarUsuario('editado perfil', email, 'yesyes', 'false')
     .then(response => {
       let id = response.body._id
@@ -48,19 +48,28 @@ describe('Testes da Funcionalidade Usuários', () => {
           "password": 'yesyes',
           "administrador": 'false'
         }
+      }).should(response => {
+        expect(response.status).equal(200)
       })
     })
     
   });
 
   it('Deve deletar um usuário previamente cadastrado', () => {
-    cadastrarUsuario('Usuario a ser deletado', 'email@', 'yesyes', 'true')
+    cy.cadastrarUsuario('usuario delete', 'olaola@gmail.com', 'yesyes', 'false')
     .then(response => {
       let id = response.body._id
       cy.request({
         method: 'DELETE',
-        url: `produtos${id}`,
-
+        url: `usuarios/${id}`,
+        body: {
+          "nome": 'usuario delete',
+          "email": 'olaola@gmail.com',
+          "password": 'yesyes',
+          "administrador": 'false'
+        }
+      }).should(response => {
+        expect(response.status).equal(200)
       })
     })
   });
